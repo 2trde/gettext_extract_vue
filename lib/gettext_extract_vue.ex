@@ -9,9 +9,16 @@ defmodule GettextExtractVue do
     tags in your vue files.
   """
   defmacro extract_vue_templates(backend) do
-    {:ok, cwd} = File.cwd
     {backend_mod, _} = Code.eval_quoted(backend)
-    recursive(cwd, %{backend: backend_mod})
+    do_extract_vue_templates(backend_mod)
+  end
+
+  def do_extract_vue_templates(backend) do
+    {:ok, cwd} = File.cwd
+    do_extract_vue_templates(backend, cwd)
+  end
+  def do_extract_vue_templates(backend, cwd) do
+    recursive(cwd, %{backend: backend})
   end
 
   @doc """

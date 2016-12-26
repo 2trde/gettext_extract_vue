@@ -19,20 +19,22 @@ defmodule Mix.Tasks.GettextVue.Extract do
     scan locale directories in priv/gettext. There we expect dirs
     like en_US, en, de and so on
   """
-  def scan_locales(path) do
+  def scan_locales(path) when is_binary(path) do
     case File.ls(path) do
       {:ok, files} ->
-        IO.puts "files #{files}"
-        Enum.reduce(files, %{}, fn(file, acc) ->
-          fname = "#{path}/#{file}"
-          if File.dir?(fname) do
-            Map.put(acc, file, load_po_files(file, fname))
-          else
-            acc
-          end
-        end)
+        scan_locales(path, files)
       _ -> nil
     end
+  end
+  def scan_locales(path, files) when is_list(files) do
+    Enum.reduce(files, %{}, fn(file, acc) ->
+      fname = "#{path}/#{file}"
+      if File.dir?(fname) do
+        Map.put(acc, file, load_po_files(file, fname))
+      else
+        acc
+      end
+    end)
   end
 
   @doc """
