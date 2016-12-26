@@ -1,6 +1,18 @@
 # GettextExtractVue
 
-**TODO: Add description**
+If you are using elixir with phoenix, vuejs for the frontend with .vue single files and
+need i18n with gettext then this package might be helpful for you.
+
+With [vue-gettext](https://github.com/Polyconseil/vue-gettext) you can use gettext with
+vuejs. But it requires a json file and a couple of js packages to extract the translations.
+
+With elixir/gettext there are already translations for backend stuff like validation messages
+and so on. It might be good to combine that.
+
+This package will scan your .vue files for <translation> elements and add these msgids to
+gettext. They are then translated like the rest of the elixir-gettext messages. Later
+you can create a translation.js file, that can be included in vue-gettext and the frontend
+is translated as well.
 
 ## Installation
 
@@ -10,8 +22,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:gettext_extract_vue, "~> 0.1.0"}]
-      {:gettext_extract_vue, "~> 0.1.0", only: :dev},
+      [{:gettext_extract_vue, github: "mlankenau/gettext_extract_vue"]
     end
     ```
 
