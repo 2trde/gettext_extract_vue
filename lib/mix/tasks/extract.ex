@@ -8,33 +8,48 @@ defmodule Mix.Tasks.GettextVue.Extract do
   @default_target_json "web/static/js/translations.js"
 
   def run(args) do
-    po_file_path = @default_po_file_path
     target_json = @default_target_json
-    translations = scan_locales(po_file_path)
+    translations = scan_locales(po_file_path(args))
     {:ok, content} = Poison.encode(translations)
     File.write(target_json, "export default #{ content}")
   end
+
+  def po_file_path([]), do: [@default_po_file_path]
+  def po_file_path(paths), do: paths
 
   @doc """
     scan locale directories in priv/gettext. There we expect dirs
     like en_US, en, de and so on
   """
-  def scan_locales(path) when is_binary(path) do
+  def scan_locales(path_list) when is_list(path_list) do
+    path_list
+    |> Enum.reduce(%{}, fn(x, acc) ->
+      x = scan_locales(x)
+
+      languages =
+        (Map.keys(x) ++ Map.keys(acc))
+        |> Enum.uniq
+
+      languages
+      |> Enum.map(fn(lang) ->
+        {lang, Map.merge( Map.get(acc, lang, %{}), Map.get(x, lang, %{}))}
+      end)
+      |> Enum.into(%{})
+    end)
+  end
+  def scan_locales(path) do
     case File.ls(path) do
       {:ok, files} ->
-        scan_locales(path, files)
+        Enum.reduce(files, %{}, fn(file, acc) ->
+          fname = "#{path}/#{file}"
+          if File.dir?(fname) do
+            Map.put(acc, file, load_po_files(file, fname))
+          else
+            acc
+          end
+        end)
       _ -> nil
     end
-  end
-  def scan_locales(path, files) when is_list(files) do
-    Enum.reduce(files, %{}, fn(file, acc) ->
-      fname = "#{path}/#{file}"
-      if File.dir?(fname) do
-        Map.put(acc, file, load_po_files(file, fname))
-      else
-        acc
-      end
-    end)
   end
 
   @doc """
