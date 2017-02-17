@@ -67,7 +67,7 @@ defmodule Mix.Tasks.GettextVue.Extract do
   @doc """
     load a single po file and parse the content
   """
-  def load_po(locale, file, fname) do
+  def load_po(_locale, _file, fname) do
     state =
       File.stream!(fname)
       |> Enum.reduce(%{dict: %{}}, fn (line, state) ->
