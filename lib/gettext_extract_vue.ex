@@ -55,6 +55,12 @@ defmodule GettextExtractVue do
   def parse(<< "<translate>" <> rem >>, ctx) do
     parse_translate(rem, "", ctx)
   end
+  def parse(<< "$gettext(\"" <> rem >>, ctx) do
+    parse_translate_js(rem, "", ctx)
+  end
+  def parse(<< "$gettext('" <> rem >>, ctx) do
+    parse_translate_js(rem, "", ctx)
+  end
   def parse("", _ctx), do: nil
   def parse(<< c, rem :: binary >>, ctx) do
     parse(rem, ctx)
@@ -71,6 +77,21 @@ defmodule GettextExtractVue do
     parse_translate(rem, buffer <> << c >>, ctx)
   end
   def parse_translate("", buffer, ctx) do
+    raise "can't find closing translate tag in #{ctx.file}"
+  end
+
+  def parse_translate_js("\")" <> rem, buffer, ctx) do
+    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
+    parse(rem, ctx)
+  end
+  def parse_translate_js("')" <> rem, buffer, ctx) do
+    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
+    parse(rem, ctx)
+  end
+  def parse_translate_js(<< c, rem :: binary >>, buffer, ctx) do
+    parse_translate_js(rem, buffer <> << c >>, ctx)
+  end
+  def parse_translate_js("", buffer, ctx) do
     raise "can't find closing translate tag in #{ctx.file}"
   end
 end
