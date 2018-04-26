@@ -18,7 +18,7 @@ defmodule GettextExtractVue do
     do_extract_vue_templates(backend, cwd)
   end
   def do_extract_vue_templates(backend, cwd) do
-    recursive(cwd, %{backend: backend})
+    recursive(cwd <> "/web/static", %{backend: backend})
   end
 
   @doc """
