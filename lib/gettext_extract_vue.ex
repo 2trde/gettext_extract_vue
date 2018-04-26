@@ -36,7 +36,7 @@ defmodule GettextExtractVue do
     extract file, if it is a vue template
   """
   def extract(file, ctx) do
-    if String.ends_with?(file, ".vue") do
+    if String.ends_with?(file, ".vue") or String.ends_with?(file, ".js")do
       extract_vue(file, Map.put(ctx, :file, file))
     end
   end
@@ -55,10 +55,13 @@ defmodule GettextExtractVue do
   def parse(<< "<translate>" <> rem >>, ctx) do
     parse_translate(rem, "", ctx)
   end
-  def parse(<< "$gettext(\"" <> rem >>, ctx) do
+  def parse(<< "<Translate>" <> rem >>, ctx) do
+    parse_translate(rem, "", ctx)
+  end
+  def parse(<< "gettext(\"" <> rem >>, ctx) do
     parse_translate_js(rem, "", ctx)
   end
-  def parse(<< "$gettext('" <> rem >>, ctx) do
+  def parse(<< "gettext('" <> rem >>, ctx) do
     parse_translate_js(rem, "", ctx)
   end
   def parse("", _ctx), do: nil
@@ -70,6 +73,10 @@ defmodule GettextExtractVue do
     parse inside the template-element and buffer the content
   """
   def parse_translate("</translate>" <> rem, buffer, ctx) do
+    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
+    parse(rem, ctx)
+  end
+  def parse_translate("</Translate>" <> rem, buffer, ctx) do
     Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
     parse(rem, ctx)
   end
