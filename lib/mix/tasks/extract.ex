@@ -5,7 +5,7 @@ defmodule Mix.Tasks.GettextVue.Extract do
   @shortdoc "Extracts translations from vue files and put result to web/static/js/translations.js"
 
   @default_po_file_path "priv/gettext"
-  @default_target_json "web/static/js/translations.js"
+  @default_target_json "src/translations.js"
 
   def run(args) do
     target_json = @default_target_json
