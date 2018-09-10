@@ -10,7 +10,7 @@ defmodule Mix.Tasks.GettextVue.Extract do
   def run(args) do
     target_json = @default_target_json
     translations = scan_locales(po_file_path(args))
-    {:ok, content} = Poison.encode(translations)
+    {:ok, content} = Poison.encode(translations, pretty: true)
     File.write(target_json, "export default #{ content}")
   end
 
