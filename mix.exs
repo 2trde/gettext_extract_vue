@@ -37,7 +37,7 @@ defmodule GettextExtractVue.Mixfile do
   defp deps do
     [{:poison, "~> 3.0"},
      {:meck, "~> 0.8.4"},
-     {:gettext, "~> 0.12", only: :test},
+     {:gettext, "~> 0.16"},
    ]
   end
 end

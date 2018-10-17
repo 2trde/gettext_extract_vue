@@ -73,11 +73,11 @@ defmodule GettextExtractVue do
     parse inside the template-element and buffer the content
   """
   def parse_translate("</translate>" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
+    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
     parse(rem, ctx)
   end
   def parse_translate("</Translate>" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
+    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
     parse(rem, ctx)
   end
   def parse_translate(<< c, rem :: binary >>, buffer, ctx) do
@@ -88,11 +88,11 @@ defmodule GettextExtractVue do
   end
 
   def parse_translate_js("\")" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
+    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
     parse(rem, ctx)
   end
   def parse_translate_js("')" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer)
+    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
     parse(rem, ctx)
   end
   def parse_translate_js(<< c, rem :: binary >>, buffer, ctx) do
