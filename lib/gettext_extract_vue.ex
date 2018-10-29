@@ -65,7 +65,7 @@ defmodule GettextExtractVue do
     parse_translate_js(rem, "", ctx)
   end
   def parse("", _ctx), do: nil
-  def parse(<< c, rem :: binary >>, ctx) do
+  def parse(<< _c, rem :: binary >>, ctx) do
     parse(rem, ctx)
   end
 
@@ -83,7 +83,7 @@ defmodule GettextExtractVue do
   def parse_translate(<< c, rem :: binary >>, buffer, ctx) do
     parse_translate(rem, buffer <> << c >>, ctx)
   end
-  def parse_translate("", buffer, ctx) do
+  def parse_translate("", _buffer, ctx) do
     raise "can't find closing translate tag in #{ctx.file}"
   end
 
