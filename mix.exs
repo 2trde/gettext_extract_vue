@@ -35,8 +35,8 @@ defmodule GettextExtractVue.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:poison, "~> 3.0"},
-     {:meck, "~> 0.8.4"},
+    [{:poison, ">= 3.0.0"},
+     {:meck, "~> 0.8"},
      {:gettext, "~> 0.16"},
    ]
   end
