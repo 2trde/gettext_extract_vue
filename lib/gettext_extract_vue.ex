@@ -36,7 +36,7 @@ defmodule GettextExtractVue do
     extract file, if it is a vue template
   """
   def extract(file, ctx) do
-    if String.ends_with?(file, ".vue") or String.ends_with?(file, ".js")do
+    if String.ends_with?(file, ".vue") or String.ends_with?(file, ".js") or String.ends_with?(file, ".ts") or String.ends_with?(file, ".tsx") do
       extract_vue(file, Map.put(ctx, :file, file))
     end
   end
