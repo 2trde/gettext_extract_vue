@@ -18,51 +18,52 @@ is translated as well.
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
-  1. Add `gettext_extract_vue` to your list of dependencies in `mix.exs`:
+1. Add `gettext_extract_vue` to your list of dependencies in `mix.exs`:
+
 
     ```elixir
     def deps do
-      [{:gettext_extract_vue, github: "mlankenau/gettext_extract_vue"]
+      [{:gettext_extract_vue, github: "2trde/gettext_extract_vue"]
     end
     ```
 
-  2. Add the extraction macro somewhere in your code, e.g. in your endpoint class
+2. Add the extraction macro somewhere in your code, e.g. in your endpoint class
 
-  ```elixir
-  defmodule WebUI.Endpoint do
-    use Phoenix.Endpoint, otp_app: :web_ui
+```elixir
+defmodule WebUI.Endpoint do
+  use Phoenix.Endpoint, otp_app: :web_ui
 
-    require GettextExtractVue
-    GettextExtractVue.extract_vue_templates(WebUI.Gettext)
+  require GettextExtractVue
+  GettextExtractVue.extract_vue_templates(WebUI.Gettext)
 
-    ...
+  ...
 
-  end
-  ```
+end
+```
 
-  3. Extract vue tampltes
+3. Extract vue tampltes
 
-  Call
-  ```
-  mix gettext.extract
-  ```
+Call
 
-  Your translations will be put in ```priv/gettext/default.pot```
+```
+mix gettext.extract
+```
 
-  4. Follow the gettext documentation to merge to your locales
+Your translations will be put in `priv/gettext/default.pot`
 
-  e.g.
-  ```
-  mix gettext.merge priv/gettext --locale=de
-  ```
+4. Follow the gettext documentation to merge to your locales
 
-  5. Create the translation js file
+e.g.
 
-  ```
-  mix gettext_vue.extract
-  ```
-  This will create or update the web/static/js/translation.js
-  file.
+```
+mix gettext.merge priv/gettext --locale=de
+```
 
+5. Create the translation js file
 
+```
+mix gettext_vue.extract
+```
 
+This will create or update the web/static/js/translation.js
+file.
