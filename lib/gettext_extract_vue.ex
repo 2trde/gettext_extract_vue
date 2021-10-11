@@ -1,7 +1,8 @@
 defmodule GettextExtractVue do
   @moduledoc """
-    Allow extraction of template-tags in vue templates. 
+    Allow extraction of template-tags in vue templates.
   """
+  alias GettextExtractVue.JSParserInterface
 
   @doc """
     Use this macro somewhere in you code, e.g. in the endpoint. It will be
@@ -14,91 +15,46 @@ defmodule GettextExtractVue do
   end
 
   def do_extract_vue_templates(backend) do
-    {:ok, cwd} = File.cwd
+    {:ok, cwd} = File.cwd()
     do_extract_vue_templates(backend, cwd)
   end
+
   def do_extract_vue_templates(backend, cwd) do
-    recursive(cwd <> "/src", %{backend: backend})
-  end
+    files = Path.wildcard("#{cwd}/src/**/*.{vue,js,ts,tsx,ex}")
+    chunk_count = floor(Enum.count(files) / 10)
 
-  @doc """
-    scan dir recursive
-  """
-  def recursive(dir \\ ".", ctx) do
-    Enum.each(File.ls!(dir), fn file ->
-      fname = "#{dir}/#{file}"
-      if File.dir?(fname), do: recursive(fname, ctx)
-      extract(fname, ctx)
-    end)
-  end
+    Task.await_many(
+      Enum.chunk_every(files, chunk_count)
+      |> Enum.map(fn files ->
+        Task.async(fn ->
+          Enum.map(files, fn file -> extract_vue(file, %{backend: backend}) end)
+        end)
+      end),
+      60 * 1000 * 5
+    )
 
-  @doc """
-    extract file, if it is a vue template
-  """
-  def extract(file, ctx) do
-    if String.ends_with?(file, ".vue") or String.ends_with?(file, ".js") or String.ends_with?(file, ".ts") or String.ends_with?(file, ".tsx") do
-      extract_vue(file, Map.put(ctx, :file, file))
-    end
+    IO.puts("Processed #{Enum.count(files)} frontend files")
   end
 
   @doc """
     extract vue file
   """
   def extract_vue(file, ctx) do
-    {:ok, content} = File.read(file)
-    parse(content, ctx)
-  end
+    case JSParserInterface.extract_gettext(file) do
+      {:ok, values} ->
+        Enum.map(values, fn val ->
+          Gettext.Extractor.extract(
+            %Macro.Env{file: file, line: 1},
+            ctx.backend,
+            "default",
+            val,
+            []
+          )
+        end)
 
-  @doc """
-    parse file until we hit a <translate> element
-  """
-  def parse(<< "<translate>" <> rem >>, ctx) do
-    parse_translate(rem, "", ctx)
-  end
-  def parse(<< "<Translate>" <> rem >>, ctx) do
-    parse_translate(rem, "", ctx)
-  end
-  def parse(<< "gettext(\"" <> rem >>, ctx) do
-    parse_translate_js(rem, "", ctx)
-  end
-  def parse(<< "gettext('" <> rem >>, ctx) do
-    parse_translate_js(rem, "", ctx)
-  end
-  def parse("", _ctx), do: nil
-  def parse(<< _, rem :: binary >>, ctx) do
-    parse(rem, ctx)
-  end
-
-  @doc """
-    parse inside the template-element and buffer the content
-  """
-  def parse_translate("</translate>" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
-    parse(rem, ctx)
-  end
-  def parse_translate("</Translate>" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
-    parse(rem, ctx)
-  end
-  def parse_translate(<< c, rem :: binary >>, buffer, ctx) do
-    parse_translate(rem, buffer <> << c >>, ctx)
-  end
-  def parse_translate("", _, ctx) do
-    raise "can't find closing translate tag in #{ctx.file}"
-  end
-
-  def parse_translate_js("\")" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
-    parse(rem, ctx)
-  end
-  def parse_translate_js("')" <> rem, buffer, ctx) do
-    Gettext.Extractor.extract(%Macro.Env{file: ctx.file, line: 1}, ctx.backend, "default", buffer, [])
-    parse(rem, ctx)
-  end
-  def parse_translate_js(<< c, rem :: binary >>, buffer, ctx) do
-    parse_translate_js(rem, buffer <> << c >>, ctx)
-  end
-  def parse_translate_js("", _, ctx) do
-    raise "can't find closing translate tag in #{ctx.file}"
+      {:error, error} ->
+        IO.puts("Failed to parse #{file} via js: #{error}")
+        System.halt(1)
+    end
   end
 end

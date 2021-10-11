@@ -1,0 +1,20 @@
+{
+  "name": "gettext_extract_vue",
+  "version": "1.0.0",
+  "main": "src/parser.mjs",
+  "repository": "git@github.com:2trde/gettext_extract_vue.git",
+  "author": "Jonas Dellinger <jonas.dellinger@2trde.com>",
+  "license": "private",
+  "private": "true",
+  "scripts": {
+    "build": "webpack"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.15.7",
+    "@babel/traverse": "^7.15.4",
+    "webpack": "^5.57.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.8.0"
+  }
+}
