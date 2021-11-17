@@ -12,6 +12,8 @@ const result = parser.parse(code.toString("utf-8"), {
 
 const gettextValues = [];
 
+const translateFuncs = ["gettext", "t"];
+
 traverse(result, {
   JSXElement(path) {
     const { node } = path;
@@ -30,7 +32,13 @@ traverse(result, {
   },
   CallExpression(path) {
     const { node } = path;
-    if (["gettext", "t"].includes(node.callee.name)) {
+
+    const isTranslateFunc = translateFuncs.includes(node.callee.name);
+    const isTranslateMemberExpr =
+      node.callee.type === "MemberExpression" &&
+      translateFuncs.includes(node.callee.property.name);
+
+    if (isTranslateFunc || isTranslateMemberExpr) {
       gettextValues.push(
         ...node.arguments
           .filter(({ value }) => typeof value === "string")

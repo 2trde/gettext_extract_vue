@@ -7,4 +7,17 @@ const Component = () => {
   );
 };
 
+export class ClassComponent {
+  constructor() {}
+
+  render() {
+    return (
+      <div>
+        Hello
+        {this.props.t("YOLO")}
+      </div>
+    );
+  }
+}
+
 export default Component;
