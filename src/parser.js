@@ -13,10 +13,26 @@ const result = parser.parse(code.toString("utf-8"), {
 const gettextValues = [];
 
 const translateFuncs = ["gettext", "t"];
+const commentPrefix = "@translations ";
+const commentSeperator = "|";
 
 traverse(result, {
-  JSXElement(path) {
-    const { node } = path;
+  JSXEmptyExpression({ node }) {
+    const comments = node?.innerComments
+      ?.filter(({ type }) => type === "CommentBlock")
+      ?.map(({ value }) => value.trim())
+      ?.flatMap((value) =>
+        value.startsWith(commentPrefix)
+          ? value.slice(commentPrefix.length).split(commentSeperator)
+          : []
+      )
+      ?.map((key) => key.trim());
+
+    if (comments && comments.length > 0) {
+      gettextValues.push(...comments);
+    }
+  },
+  JSXElement({ node }) {
     if (node.openingElement?.name?.name === "Translate") {
       if (node.children.length !== 1) {
         console.error(
@@ -30,9 +46,7 @@ traverse(result, {
       }
     }
   },
-  CallExpression(path) {
-    const { node } = path;
-
+  CallExpression({ node }) {
     const isTranslateFunc = translateFuncs.includes(node.callee.name);
     const isTranslateMemberExpr =
       node.callee.type === "MemberExpression" &&

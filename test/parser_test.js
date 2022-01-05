@@ -1,6 +1,7 @@
 const Component = () => {
   return (
     <div>
+      {/* @translations free_delivery|costly_delivery */}
       {(gettext("Hello World"), yolo("what"))}
       <Translate>Hello World</Translate>
     </div>
