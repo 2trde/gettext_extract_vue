@@ -8,8 +8,7 @@ defmodule Mix.Tasks.GettextVue.Extract do
   @default_target_json_dir "src/"
 
   def run(args) do
-    %{paths: paths, seperate_language_files: seperate_language_files, output_dir: output_dir} =
-      parse_args(args)
+    %{paths: paths, seperate_language_files: seperate_language_files, output_dir: output_dir} = parse_args(args)
 
     translations = scan_locales(paths)
     File.mkdir_p!(output_dir)
@@ -36,8 +35,7 @@ defmodule Mix.Tasks.GettextVue.Extract do
   end
 
   def parse_args(args) do
-    {flags, values} =
-      OptionParser.parse!(args, strict: [seperate_language_files: :boolean, output_dir: :string])
+    {flags, values} = OptionParser.parse!(args, strict: [seperate_language_files: :boolean, output_dir: :string])
 
     %{
       paths: po_file_path(values),

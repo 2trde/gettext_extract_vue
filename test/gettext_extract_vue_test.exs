@@ -3,14 +3,11 @@ defmodule GettextExtractVueTest do
   doctest GettextExtractVue
 
   test "extract_vue_templates" do
-    :meck.expect(Gettext.Extractor, :extract,
-                 fn(%Macro.Env{file: "./test/test_templates/test.vue"},
-                    :gettext_backend, "default", key, []) ->
-                   send self(), {:translate, key}
-                 end)
+    :meck.expect(Gettext.Extractor, :extract, fn %Macro.Env{file: _}, :gettext_backend, "default", _, key, [] ->
+      send(self(), {:translate, key})
+    end)
 
-    backend = :gettext_backend
-    GettextExtractVue.recursive(".", %{backend: backend})
+    GettextExtractVue.extract_vue_templates(:gettext_backend)
     assert_receive {:translate, "Foo"}
     assert_receive {:translate, "Bar"}
   end

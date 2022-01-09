@@ -21,7 +21,7 @@ defmodule GettextExtractVue do
 
   def do_extract_vue_templates(backend, cwd) do
     files = Path.wildcard("#{cwd}/src/**/*.{vue,js,ts,tsx,ex}")
-    chunk_count = floor(Enum.count(files) / 10)
+    chunk_count = max(floor(Enum.count(files) / 10), 1)
 
     Task.await_many(
       Enum.chunk_every(files, chunk_count)
@@ -43,13 +43,7 @@ defmodule GettextExtractVue do
     case JSParserInterface.extract_gettext(file) do
       {:ok, values} ->
         Enum.map(values, fn val ->
-          Gettext.Extractor.extract(
-            %Macro.Env{file: file, line: 1},
-            ctx.backend,
-            "default",
-            val,
-            []
-          )
+          Gettext.Extractor.extract(%Macro.Env{file: file, line: 1}, ctx.backend, "default", nil, val, [])
         end)
 
       {:error, error} ->
