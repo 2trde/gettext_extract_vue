@@ -81,8 +81,9 @@ defmodule Mix.Tasks.GettextVue.Extract do
           end
         end)
 
-      _ ->
-        nil
+      other ->
+        IO.inspect(other)
+        %{}
     end
   end
 
