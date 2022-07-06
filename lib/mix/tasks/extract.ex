@@ -16,7 +16,11 @@ defmodule Mix.Tasks.GettextVue.Extract do
     case seperate_language_files do
       true ->
         Enum.map(translations, fn {language, values} ->
-          {:ok, content} = Poison.encode(values, pretty: true)
+          content =
+            values
+            |> Enum.map(fn {key, value} -> {key, String.replace(value, "\\n", "\n")} end)
+            |> Enum.into(%{})
+            |> Poison.encode!(pretty: true)
 
           File.write(
             Path.join(output_dir, "#{language}.json"),
