@@ -147,6 +147,6 @@ defmodule Mix.Tasks.GettextVue.Extract do
   defp trim_no_quotes(str) do
     str
     |> String.trim()
-    |> String.slice(1..-2)
+    |> String.slice(1..-2//-1)
   end
 end
